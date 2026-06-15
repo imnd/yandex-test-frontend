@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 const api: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
     withCredentials: true,
     headers: {
         'X-Requested-With': 'XMLHttpRequest',
@@ -24,7 +24,7 @@ api.interceptors.response.use(
 
 // Method to perform Sanctum CSRF handshake
 export const getCsrfCookie = (): Promise<AxiosResponse> => {
-    return axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+    return axios.get(import.meta.env.VITE_SANCTUM_CSRF_URL || 'http://localhost:8000/sanctum/csrf-cookie', {
         withCredentials: true
     });
 };
