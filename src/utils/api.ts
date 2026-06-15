@@ -1,7 +1,31 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
+const getBaseApiUrl = (): string => {
+    if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL;
+    }
+    const hostname = window.location.hostname;
+    if (hostname.endsWith('-frontend.onrender.com')) {
+        const backendHost = hostname.replace('-frontend.onrender.com', '-backend.onrender.com');
+        return `https://${backendHost}/api`;
+    }
+    return 'http://localhost:8000/api';
+};
+
+const getCsrfCookieUrl = (): string => {
+    if (import.meta.env.VITE_SANCTUM_CSRF_URL) {
+        return import.meta.env.VITE_SANCTUM_CSRF_URL;
+    }
+    const hostname = window.location.hostname;
+    if (hostname.endsWith('-frontend.onrender.com')) {
+        const backendHost = hostname.replace('-frontend.onrender.com', '-backend.onrender.com');
+        return `https://${backendHost}/sanctum/csrf-cookie`;
+    }
+    return 'http://localhost:8000/sanctum/csrf-cookie';
+};
+
 const api: AxiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+    baseURL: getBaseApiUrl(),
     withCredentials: true,
     headers: {
         'X-Requested-With': 'XMLHttpRequest',
@@ -39,7 +63,7 @@ api.interceptors.response.use(
 
 // Method to perform Sanctum CSRF handshake
 export const getCsrfCookie = (): Promise<AxiosResponse> => {
-    return axios.get(import.meta.env.VITE_SANCTUM_CSRF_URL || 'http://localhost:8000/sanctum/csrf-cookie', {
+    return axios.get(getCsrfCookieUrl(), {
         withCredentials: true
     });
 };
