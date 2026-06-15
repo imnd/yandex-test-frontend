@@ -44,4 +44,12 @@ export const getCsrfCookie = (): Promise<AxiosResponse> => {
     });
 };
 
+// Helper to fetch the plain-text CSRF token and set it in the headers for cross-domain support
+export const getCsrfToken = async (): Promise<void> => {
+    const response = await api.get('/csrf-token');
+    if (response.data && response.data.token) {
+        api.defaults.headers.common['X-CSRF-TOKEN'] = response.data.token;
+    }
+};
+
 export default api;
