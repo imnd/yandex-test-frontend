@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import api, { getCsrfCookie } from '../utils/axios';
+import api, { getCsrfCookie } from '../utils/api';
 
 const router = useRouter();
 const email = ref<string>('admin@example.com');

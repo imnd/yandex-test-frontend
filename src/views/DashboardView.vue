@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import api from '../utils/axios';
+import api from '../utils/api';
 
 const router = useRouter();
 
