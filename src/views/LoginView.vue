@@ -55,7 +55,6 @@ const handleLogin = async () => {
     <div class="login-card glass animate-fade">
       <div class="login-header">
         <h2>Вход в панель</h2>
-        <p>Используйте сид-пользователя для авторизации</p>
       </div>
 
       <form @submit.prevent="handleLogin" class="login-form">
