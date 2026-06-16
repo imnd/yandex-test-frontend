@@ -19,6 +19,7 @@ const api: AxiosInstance = axios.create({
 });
 
 let csrfCookiePromise: Promise<unknown> | null = null;
+let memoryCsrfToken: string | null = null;
 
 // Request interceptor to manually set CSRF headers for stateful requests
 api.interceptors.request.use(
@@ -30,10 +31,14 @@ api.interceptors.request.use(
             config.headers['X-XSRF-TOKEN'] = cookieToken;
         }
 
+        if (memoryCsrfToken) {
+            config.headers['X-CSRF-TOKEN'] = memoryCsrfToken;
+        }
+
         // Lazy fetch CSRF cookie for POST/PUT/PATCH/DELETE requests if not present (cross-domain support)
         const method = config.method?.toUpperCase();
         if (method && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-            if (!cookieToken) {
+            if (!cookieToken && !memoryCsrfToken) {
                 if (!csrfCookiePromise) {
                     csrfCookiePromise = getCsrfCookie().finally(() => {
                         csrfCookiePromise = null;
@@ -41,10 +46,14 @@ api.interceptors.request.use(
                 }
                 await csrfCookiePromise;
                 
-                const matchesAfter = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
-                cookieToken = matchesAfter ? decodeURIComponent(matchesAfter[1]) : null;
-                if (cookieToken) {
-                    config.headers['X-XSRF-TOKEN'] = cookieToken;
+                if (memoryCsrfToken) {
+                    config.headers['X-CSRF-TOKEN'] = memoryCsrfToken;
+                } else {
+                    const matchesAfter = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
+                    cookieToken = matchesAfter ? decodeURIComponent(matchesAfter[1]) : null;
+                    if (cookieToken) {
+                        config.headers['X-XSRF-TOKEN'] = cookieToken;
+                    }
                 }
             }
         }
@@ -71,11 +80,16 @@ api.interceptors.response.use(
         if (error.response && error.response.status === 419 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
+                memoryCsrfToken = null; // force refetch
                 await getCsrfCookie();
-                const matches = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
-                const cookieToken = matches ? decodeURIComponent(matches[1]) : null;
-                if (cookieToken) {
-                    originalRequest.headers['X-XSRF-TOKEN'] = cookieToken;
+                if (memoryCsrfToken) {
+                    originalRequest.headers['X-CSRF-TOKEN'] = memoryCsrfToken;
+                } else {
+                    const matches = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
+                    const cookieToken = matches ? decodeURIComponent(matches[1]) : null;
+                    if (cookieToken) {
+                        originalRequest.headers['X-XSRF-TOKEN'] = cookieToken;
+                    }
                 }
                 return api(originalRequest);
             } catch (csrfError) {
@@ -88,10 +102,14 @@ api.interceptors.response.use(
 );
 
 // Method to perform Sanctum CSRF handshake
-export const getCsrfCookie = (): Promise<AxiosResponse> => {
-    return axios.get(getCsrfCookieUrl(), {
+export const getCsrfCookie = async (): Promise<AxiosResponse> => {
+    const response = await axios.get(getCsrfCookieUrl(), {
         withCredentials: true
     });
+    if (response.data && response.data.token) {
+        memoryCsrfToken = response.data.token;
+    }
+    return response;
 };
 
 export default api;
