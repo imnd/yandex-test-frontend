@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useOrganizationStore } from "@/stores/organization";
 import { useReviewsStore } from "@/stores/reviews";
+import StarRating from "@/components/StarRating.vue";
 
 const organizationStore = useOrganizationStore();
 const reviewsStore = useReviewsStore();
@@ -58,14 +59,7 @@ const changePage = (page: number) => {
           <div class="review-meta">
             <div class="author-name">{{ review.author_name }}</div>
             <div class="review-meta-row">
-              <div class="star-rating">
-                    <span
-                        v-for="n in 5"
-                        :key="n"
-                        class="star"
-                        :class="{ 'star-filled': n <= review.rating }"
-                    >★</span>
-              </div>
+              <StarRating :rating="review.rating" />
               <span class="review-date">{{ review.published_at_str }}</span>
             </div>
           </div>
