@@ -3,6 +3,7 @@ import { useOrganizationStore } from "@/stores/organization";
 import { storeToRefs } from "pinia";
 import { useUiStore } from "@/stores/ui";
 import { onMounted } from "vue";
+import StarRating from "@/components/StarRating.vue";
 
 const organizationStore = useOrganizationStore();
 const uiStore = useUiStore();
@@ -33,17 +34,10 @@ onMounted(fetchOrganization);
       </div>
 
       <div class="org-stats">
-        <div class="rating-box">
+          <div class="rating-box">
           <div class="rating-value">{{ parseFloat(String(organization.rating || 0)).toFixed(1) }}</div>
           <div class="rating-stars-container">
-            <div class="star-rating">
-                  <span
-                      v-for="n in 5"
-                      :key="n"
-                      class="star"
-                      :class="{ 'star-filled': n <= Math.round(Number(organization.rating || 0)) }"
-                  >★</span>
-            </div>
+            <StarRating :rating="Number(organization.rating || 0)" />
           </div>
         </div>
 
