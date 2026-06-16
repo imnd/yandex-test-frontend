@@ -4,8 +4,8 @@ import { useRouter } from 'vue-router';
 import api, { getCsrfCookie } from '../utils/api';
 
 const router = useRouter();
-const email = ref<string>('admin@example.com');
-const password = ref<string>('password');
+const email = ref<string>('');
+const password = ref<string>('');
 const isLoading = ref<boolean>(false);
 const error = ref<string>('');
 
