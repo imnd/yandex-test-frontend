@@ -31,7 +31,7 @@ export const useReviewsStore = defineStore('reviews', () => {
     const fetchReviews = async (page: number = 1) => {
         isReviewsLoading.value = true
         try {
-            const { data } = await api.get(`/organization/reviews?page=${page}`)
+            const { data } = await api.get(`/organization/reviews?page=${page}&per_page=50`)
             reviews.value = data.reviews || []
             pagination.value = data.pagination || {
                 current_page: 1,
