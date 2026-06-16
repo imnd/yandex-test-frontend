@@ -1,90 +1,31 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import Navbar from '../components/Navbar.vue';
-import api from '../utils/api';
-
-interface Organization {
-  id?: number;
-  name?: string;
-  url: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  rating?: number | string;
-  rating_count?: number;
-  review_count?: number;
-  last_parsed_at?: string;
-  error_message?: string;
-}
-
-interface Review {
-  id: number;
-  author_name: string;
-  author_avatar?: string;
-  rating: number;
-  published_at_str: string;
-  text?: string;
-}
-
-interface Pagination {
-  current_page: number;
-  last_page: number;
-  total: number;
-  per_page: number;
-}
+import { onMounted, onUnmounted } from 'vue';
+import Navbar from '@/components/Navbar.vue';
+import api from '@/utils/api';
 
 // State
-const organization = ref<Organization | null>(null);
-const reviews = ref<Review[]>([]);
-const pagination = ref<Pagination>({
-  current_page: 1,
-  last_page: 1,
-  total: 0,
-  per_page: 50,
-});
+import { storeToRefs } from 'pinia';
+import { useOrganizationStore } from '@/stores/organization';
+import { useReviewsStore } from '@/stores/reviews';
+import { useUiStore } from '@/stores/ui';
 
-const urlInput = ref<string>('');
-const isSaving = ref<boolean>(false);
-const isRefreshing = ref<boolean>(false);
-const isReviewsLoading = ref<boolean>(false);
-const errorAlert = ref<string>('');
-const successAlert = ref<string>('');
+// Инициализация сторов
+const organizationStore = useOrganizationStore();
+const reviewsStore = useReviewsStore();
+const uiStore = useUiStore();
 
-const fetchOrganization = async () => {
-  try {
-    const response = await api.get('/organization');
-    organization.value = response.data.organization;
-    
-    if (organization.value) {
-      urlInput.value = organization.value.url;
-      
-      // If organization is currently parsing, start polling
-      if (organization.value.status === 'pending' || organization.value.status === 'processing') {
-        startPolling();
-      } else if (organization.value.status === 'completed') {
-        fetchReviews(pagination.value.current_page);
-      }
-    }
-  } catch (err) {
-    console.error('Error fetching organization:', err);
-  }
-};
+// Извлечение реактивного состояния
+const { organization } = storeToRefs(organizationStore);
+const { reviews, pagination, isReviewsLoading } = storeToRefs(reviewsStore);
+const { urlInput, isSaving, isRefreshing, errorAlert, successAlert } = storeToRefs(uiStore);
 
-const fetchReviews = async (page: number = 1) => {
-  isReviewsLoading.value = true;
-  try {
-    const response = await api.get(`/organization/reviews?page=${page}`);
-    reviews.value = response.data.data || [];
-    pagination.value = {
-      current_page: response.data.current_page || 1,
-      last_page: response.data.last_page || 1,
-      total: response.data.total || 0,
-      per_page: response.data.per_page || 50,
-    };
-  } catch (err) {
-    console.error('Error fetching reviews:', err);
-  } finally {
-    isReviewsLoading.value = false;
-  }
-};
+// Извлечение методов
+const { fetchOrganization, startPolling, stopPolling } = organizationStore;
+const { fetchReviews } = reviewsStore;
+
+// Хуки жизненного цикла
+onMounted(fetchOrganization);
+onUnmounted(stopPolling);
 
 const handleSaveSettings = async () => {
   if (!urlInput.value) {
@@ -142,45 +83,6 @@ const handleRefresh = async () => {
   }
 };
 
-// Polling for scraping status
-let statusPollInterval: ReturnType<typeof setInterval> | null = null;
-
-// Polling Helper Functions
-const startPolling = () => {
-  if (statusPollInterval) clearInterval(statusPollInterval);
-
-  statusPollInterval = setInterval(async () => {
-    try {
-      const response = await api.get('/organization');
-      const org = response.data.organization;
-      organization.value = org;
-
-      if (!org || org.status === 'completed' || org.status === 'failed') {
-        stopPolling();
-        isRefreshing.value = false;
-        
-        if (org && org.status === 'completed') {
-          successAlert.value = 'Импорт отзывов успешно завершен!';
-          fetchReviews(1);
-        } else if (org && org.status === 'failed') {
-          errorAlert.value = `Ошибка парсинга: ${org.error_message || 'Неизвестная ошибка'}`;
-        }
-      }
-    } catch (err) {
-      console.error('Error during polling status:', err);
-      stopPolling();
-      isRefreshing.value = false;
-    }
-  }, 3000); // Check every 3 seconds
-};
-
-const stopPolling = () => {
-  if (statusPollInterval) {
-    clearInterval(statusPollInterval);
-    statusPollInterval = null;
-  }
-};
-
 const changePage = (page: number) => {
   if (page < 1 || page > pagination.value.last_page || page === pagination.value.current_page) {
     return;
@@ -188,14 +90,6 @@ const changePage = (page: number) => {
   fetchReviews(page);
 };
 
-// Lifecycle hooks
-onMounted(() => {
-  fetchOrganization();
-});
-
-onUnmounted(() => {
-  stopPolling();
-});
 </script>
 
 <template>
@@ -271,7 +165,7 @@ onUnmounted(() => {
               Последнее обновление: {{ organization.last_parsed_at ? new Date(organization.last_parsed_at).toLocaleString('ru-RU') : 'недавно' }}
             </div>
           </div>
-          
+
           <div class="org-stats">
             <div class="rating-box">
               <div class="rating-value">{{ parseFloat(String(organization.rating || 0)).toFixed(1) }}</div>
