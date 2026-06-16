@@ -21,12 +21,12 @@ const { organization } = storeToRefs(organizationStore);
           v-model="urlInput"
           placeholder="https://yandex.ru/maps/org/yandex/1124715036/"
           class="url-input"
-          :disabled="isSaving || isRefreshing || organization?.status === 'pending' || organization?.status === 'processing'"
+          :disabled="isSaving || isRefreshing"
       />
       <button
           type="submit"
           class="save-btn"
-          :disabled="isSaving || isRefreshing || organization?.status === 'pending' || organization?.status === 'processing'"
+          :disabled="isSaving || isRefreshing"
       >
         <span v-if="isSaving" class="spinner"></span>
         <span v-else>Сохранить и загрузить</span>
