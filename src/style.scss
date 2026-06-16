@@ -45,7 +45,7 @@
 }
 
 body {
-  font-family: var(--font-family);
+  font-family: var(--font-family), serif;
   background-color: var(--bg-app);
   color: var(--text-main);
   line-height: 1.5;
@@ -129,3 +129,8 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+.text-center {
+  text-align: center;
+}
+

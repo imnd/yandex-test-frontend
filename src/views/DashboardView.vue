@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import Navbar from '../components/Navbar.vue';
 import api from '../utils/api';
-
-const router = useRouter();
 
 interface Organization {
   id?: number;
@@ -49,9 +47,6 @@ const isRefreshing = ref<boolean>(false);
 const isReviewsLoading = ref<boolean>(false);
 const errorAlert = ref<string>('');
 const successAlert = ref<string>('');
-
-// Polling for scraping status
-let statusPollInterval: ReturnType<typeof setInterval> | null = null;
 
 const fetchOrganization = async () => {
   try {
@@ -107,7 +102,7 @@ const handleSaveSettings = async () => {
     });
     organization.value = response.data.organization;
     successAlert.value = 'Настройки сохранены. Запущен парсинг отзывов...';
-    
+
     reviews.value = [];
     startPolling();
   } catch (err: any) {
@@ -147,16 +142,8 @@ const handleRefresh = async () => {
   }
 };
 
-const handleLogout = async () => {
-  try {
-    await api.post('/auth/logout');
-  } catch (err) {
-    console.error('Logout error:', err);
-  } finally {
-    localStorage.removeItem('auth_user');
-    router.push('/login');
-  }
-};
+// Polling for scraping status
+let statusPollInterval: ReturnType<typeof setInterval> | null = null;
 
 // Polling Helper Functions
 const startPolling = () => {
@@ -213,19 +200,7 @@ onUnmounted(() => {
 
 <template>
   <div class="dashboard-layout">
-    <!-- Navbar -->
-    <header class="navbar glass">
-      <div class="container navbar-content">
-        <div class="logo">
-          <span class="logo-icon">📍</span>
-          <h1>Яндекс.Карты отзывы</h1>
-        </div>
-        <button @click="handleLogout" class="logout-btn">
-          Выйти 
-          <span class="logout-icon">🚪</span>
-        </button>
-      </div>
-    </header>
+    <Navbar />
 
     <!-- Main Content -->
     <main class="container main-content animate-fade">
@@ -244,17 +219,17 @@ onUnmounted(() => {
         <h3>Настройка ссылки организации</h3>
         <p class="card-desc">Введите полную или короткую ссылку на организацию с Яндекс.Карт, чтобы загрузить ее отзывы.</p>
         <form @submit.prevent="handleSaveSettings" class="settings-form">
-          <input 
-            type="text" 
-            v-model="urlInput" 
-            placeholder="https://yandex.ru/maps/org/yandex/1124715036/" 
-            class="url-input"
-            :disabled="isSaving || isRefreshing || organization?.status === 'pending' || organization?.status === 'processing'"
+          <input
+              type="text"
+              v-model="urlInput"
+              placeholder="https://yandex.ru/maps/org/yandex/1124715036/"
+              class="url-input"
+              :disabled="isSaving || isRefreshing || organization?.status === 'pending' || organization?.status === 'processing'"
           />
-          <button 
-            type="submit" 
-            class="save-btn" 
-            :disabled="isSaving || isRefreshing || organization?.status === 'pending' || organization?.status === 'processing'"
+          <button
+              type="submit"
+              class="save-btn"
+              :disabled="isSaving || isRefreshing || organization?.status === 'pending' || organization?.status === 'processing'"
           >
             <span v-if="isSaving" class="spinner"></span>
             <span v-else>Сохранить и загрузить</span>
@@ -263,7 +238,10 @@ onUnmounted(() => {
       </section>
 
       <!-- Scraping Active Status Loader -->
-      <section v-if="organization && (organization.status === 'pending' || organization.status === 'processing')" class="card loading-card text-center">
+      <section
+          v-if="organization && (organization.status === 'pending' || organization.status === 'processing')"
+          class="card loading-card text-center"
+      >
         <div class="loader-box">
           <div class="pulse-loader"></div>
           <h4>Загрузка данных организации</h4>
@@ -278,7 +256,10 @@ onUnmounted(() => {
       </section>
 
       <!-- Organization Details Summary -->
-      <section v-if="organization && organization.status === 'completed'" class="card org-summary-card">
+      <section
+          v-if="organization && organization.status === 'completed'"
+          class="card org-summary-card"
+      >
         <div class="org-summary-grid">
           <div class="org-main-details">
             <span class="org-badge">Организация загружена</span>
@@ -332,7 +313,10 @@ onUnmounted(() => {
       </section>
 
       <!-- Reviews Section -->
-      <section v-if="organization && organization.status === 'completed'" class="reviews-section">
+      <section
+          v-if="organization && organization.status === 'completed'"
+          class="reviews-section"
+      >
         <div class="reviews-header">
           <h3>Отзывы пользователей ({{ pagination.total }})</h3>
           <p>Показано 50 отзывов на страницу</p>
@@ -441,58 +425,6 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-/* Navbar */
-.navbar {
-  border-bottom: 1px solid var(--border-color);
-  padding: 1rem 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.navbar-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.logo h1 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-heading);
-  letter-spacing: -0.5px;
-}
-
-.logo-icon {
-  font-size: 1.5rem;
-}
-
-.logout-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-main);
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.logout-btn:hover {
-  background-color: var(--border-color);
-}
-
 /* Content spacing */
 .main-content {
   padding-top: 2rem;
@@ -509,16 +441,20 @@ onUnmounted(() => {
   border-radius: var(--radius-md);
   padding: 2rem;
   box-shadow: var(--shadow-sm);
-}
 
-.card-desc {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-bottom: 1.25rem;
-}
+  &-desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+  }
 
-.text-center {
-  text-align: center;
+  &-footer {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-start;
+  }
 }
 
 /* Settings Form */
@@ -538,11 +474,11 @@ onUnmounted(() => {
   color: var(--text-main);
   outline: none;
   transition: var(--transition);
-}
 
-.url-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  &:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
 }
 
 .save-btn {
@@ -559,15 +495,15 @@ onUnmounted(() => {
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: var(--transition);
-}
 
-.save-btn:hover:not(:disabled) {
-  background-color: var(--primary-hover);
-}
+  &:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+  }
 
-.save-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 /* Alerts */
@@ -580,6 +516,10 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
+.alert-icon {
+  font-size: 1.2rem;
+}
+
 .error-alert {
   background-color: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);
@@ -590,10 +530,6 @@ onUnmounted(() => {
   background-color: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.2);
   color: var(--success);
-}
-
-.alert-icon {
-  font-size: 1.2rem;
 }
 
 /* Loading Card */
@@ -670,17 +606,17 @@ onUnmounted(() => {
   text-decoration: underline;
 }
 
-.last-parsed {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 0.5rem;
-}
-
 .org-stats {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   justify-content: center;
+}
+
+.last-parsed {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
 }
 
 .rating-box {
@@ -724,14 +660,6 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
-.card-footer {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  justify-content: flex-start;
-}
-
 .refresh-btn {
   display: flex;
   align-items: center;
@@ -746,15 +674,15 @@ onUnmounted(() => {
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: var(--transition);
-}
 
-.refresh-btn:hover:not(:disabled) {
-  background-color: var(--border-color);
-}
+  &:hover:not(:disabled) {
+    background-color: var(--border-color);
+  }
 
-.refresh-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 /* Reviews List */
@@ -825,21 +753,21 @@ onUnmounted(() => {
   border-radius: 50%;
 }
 
-.review-meta {
-  display: flex;
-  flex-direction: column;
-}
-
 .author-name {
   font-size: 1rem;
   font-weight: 700;
   color: var(--text-heading);
 }
 
-.review-meta-row {
+.review-meta {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column;
+
+  &-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
 }
 
 .review-date {
@@ -860,52 +788,54 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
+
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-heading);
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    max-width: 400px;
+  }
 }
 
 .empty-icon {
   font-size: 3rem;
 }
 
-.empty-card h4 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-heading);
-}
-
-.empty-card p {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  max-width: 400px;
-}
-
 /* Skeletons */
-.skeleton-card {
-  border-color: var(--border-color);
-}
+.skeleton {
+  &-card {
+    border-color: var(--border-color);
+  }
 
-.skeleton-header {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
+  &-header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
 
-.skeleton-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: var(--border-color);
-}
+  &-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+  }
 
-.skeleton-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
+  &-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
 
-.skeleton-line {
-  height: 12px;
-  background-color: var(--border-color);
-  border-radius: 4px;
+  &-line {
+    height: 12px;
+    background-color: var(--border-color);
+    border-radius: 4px;
+  }
 }
 
 .w-40 { width: 140px; }
@@ -922,60 +852,62 @@ onUnmounted(() => {
   padding: 1rem 0;
 }
 
-.page-nav-btn {
-  padding: 0.6rem 1.2rem;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-main);
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: var(--transition);
-}
+.page {
+  &-nav-btn {
+    padding: 0.6rem 1.2rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
 
-.page-nav-btn:hover:not(:disabled) {
-  background-color: var(--border-color);
-}
+    &:hover:not(:disabled) {
+      background-color: var(--border-color);
+    }
 
-.page-nav-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
 
-.page-numbers {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
+  &-numbers {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 
-.page-num-btn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-main);
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: var(--transition);
-}
+  &-num-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
 
-.page-num-btn:hover {
-  background-color: var(--border-color);
-}
+    &:hover {
+      background-color: var(--border-color);
+    }
 
-.page-num-btn.active {
-  background-color: var(--primary);
-  color: #ffffff;
-  border-color: var(--primary);
+    &.active {
+      background-color: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+  }
 }
 
 .spinner {
