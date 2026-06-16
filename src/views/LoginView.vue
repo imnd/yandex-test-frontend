@@ -95,7 +95,7 @@ const handleLogin = async () => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .login-wrapper {
   display: flex;
   justify-content: center;
@@ -118,19 +118,19 @@ const handleLogin = async () => {
 .login-header {
   margin-bottom: 2rem;
   text-align: center;
-}
 
-.login-header h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--text-heading);
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.5px;
-}
+  h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-heading);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+  }
 
-.login-header p {
-  color: var(--text-muted);
-  font-size: 0.95rem;
+  p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
 }
 
 .login-form {
@@ -143,35 +143,35 @@ const handleLogin = async () => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
 
-.form-group label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-heading);
-}
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-heading);
+  }
 
-.form-group input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-family: inherit;
-  font-size: 1rem;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  color: var(--text-main);
-  outline: none;
-  transition: var(--transition);
-}
+  input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-family: inherit;
+    font-size: 1rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-main);
+    outline: none;
+    transition: var(--transition);
 
-.form-group input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-}
+    &:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
 
-.form-group input:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+   }
 }
 
 .error-alert {
@@ -201,15 +201,15 @@ const handleLogin = async () => {
   cursor: pointer;
   transition: var(--transition);
   outline: none;
-}
 
-.submit-btn:hover:not(:disabled) {
-  background-color: var(--primary-hover);
-}
+  &:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+  }
 
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 }
 
 .spinner {
