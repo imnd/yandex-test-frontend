@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import api, { getCsrfCookie } from '../utils/api';
+import api, { getCsrfCookie, getAxiosErrorMessage } from '../utils/api';
 
 const router = useRouter();
 const email = ref<string>('');
@@ -33,17 +33,9 @@ const handleLogin = async () => {
 
     // 4. Redirect to dashboard
     router.push('/');
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Login error:', err);
-    if (err.response && err.response.data && err.response.data.message) {
-      error.value = err.response.data.message;
-    } else if (err.response && err.response.data && err.response.data.errors) {
-      // Validation errors
-      const validationErrors = Object.values(err.response.data.errors).flat();
-      error.value = (validationErrors[0] as string) || 'Ошибка валидации.';
-    } else {
-      error.value = 'Не удалось подключиться к серверу. Убедитесь, что бэкенд запущен.';
-    }
+    error.value = getAxiosErrorMessage(err);
   } finally {
     isLoading.value = false;
   }

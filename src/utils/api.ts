@@ -112,4 +112,19 @@ export const getCsrfCookie = async (): Promise<AxiosResponse> => {
     return response;
 };
 
+export const getAxiosErrorMessage = (err: unknown): string => {
+    if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { data?: { message?: string; errors?: string | Record<string, string[]> } } };
+        if (axiosErr.response?.data?.errors) {
+            const first = Object.values(axiosErr.response.data.errors).flat()[0];
+            return (first as string) || 'Ошибка валидации.';
+        }
+        return axiosErr.response?.data?.message ?? 'Неизвестная ошибка';
+    }
+    if (err instanceof Error) {
+        return err.message;
+    }
+    return 'Неизвестная ошибка';
+};
+
 export default api;
