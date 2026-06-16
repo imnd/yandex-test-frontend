@@ -17,18 +17,18 @@ const handleLogout = async () => {
 </script>
 
 <template>
-    <header class="navbar glass">
-      <div class="container navbar-content">
-        <div class="logo">
-          <span class="logo-icon">📍</span>
-          <h1>Яндекс.Карты отзывы</h1>
-        </div>
-        <button @click="handleLogout" class="logout-btn">
-          Выйти 
-          <span class="logout-icon">🚪</span>
-        </button>
+  <header class="navbar glass">
+    <div class="container navbar-content">
+      <div class="logo">
+        <span class="logo-icon">📍</span>
+        <h1>Яндекс.Карты отзывы</h1>
       </div>
-    </header>
+      <button @click="handleLogout" class="logout-btn">
+        Выйти
+        <span class="logout-icon">🚪</span>
+      </button>
+    </div>
+  </header>
 </template>
 
 <style scoped lang="scss">
