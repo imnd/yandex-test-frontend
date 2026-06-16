@@ -1,51 +1,14 @@
 <script setup lang="ts">
-import api from "@/utils/api";
-import {storeToRefs} from "pinia";
-import {useOrganizationStore} from "@/stores/organization";
-import {useUiStore} from "@/stores/ui";
-import {useReviewsStore} from "@/stores/reviews";
+import { storeToRefs } from "pinia";
+import { useOrganizationStore } from "@/stores/organization";
+import { useUiStore } from "@/stores/ui";
 
 const organizationStore = useOrganizationStore();
-const reviewsStore = useReviewsStore();
 const uiStore = useUiStore();
 
-const { urlInput, isSaving, isRefreshing, errorAlert, successAlert } = storeToRefs(uiStore);
+const { urlInput, isSaving, isRefreshing } = storeToRefs(uiStore);
+const { handleSaveSettings } = uiStore;
 const { organization } = storeToRefs(organizationStore);
-const { reviews } = storeToRefs(reviewsStore);
-const { startPolling } = organizationStore;
-
-const handleSaveSettings = async () => {
-  if (!urlInput.value) {
-    errorAlert.value = 'Пожалуйста, введите URL-ссылку.';
-    return;
-  }
-
-  isSaving.value = true;
-  errorAlert.value = '';
-  successAlert.value = '';
-
-  try {
-    const response = await api.post('/organization/settings', {
-      url: urlInput.value
-    });
-    organization.value = response.data.organization;
-    successAlert.value = 'Настройки сохранены. Запущен парсинг отзывов...';
-
-    reviews.value = [];
-    startPolling();
-  } catch (err: any) {
-    console.error('Error saving settings:', err);
-    if (err.response && err.response.data && err.response.data.errors) {
-      errorAlert.value = Object.values(err.response.data.errors).flat()[0] as string || 'Ошибка валидации.';
-    } else if (err.response && err.response.data && err.response.data.message) {
-      errorAlert.value = err.response.data.message;
-    } else {
-      errorAlert.value = 'Не удалось сохранить настройки.';
-    }
-  } finally {
-    isSaving.value = false;
-  }
-};
 </script>
 
 <template>

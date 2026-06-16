@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {storeToRefs} from "pinia";
+import { storeToRefs } from "pinia";
 import { useOrganizationStore } from "@/stores/organization";
 
 const organizationStore = useOrganizationStore();
 const { organization } = storeToRefs(organizationStore);
 </script>
+
 <template>
   <section v-if="!organization" class="card empty-card text-center">
     <span class="empty-icon">📍</span>

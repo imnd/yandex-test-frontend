@@ -1,39 +1,16 @@
 <script setup lang="ts">
 import { useOrganizationStore } from "@/stores/organization";
 import { storeToRefs } from "pinia";
-import api from "@/utils/api";
 import {useUiStore} from "@/stores/ui";
 import {onMounted, onUnmounted} from "vue";
 
 const organizationStore = useOrganizationStore();
 const uiStore = useUiStore();
 
+const { isSaving, isRefreshing } = storeToRefs(uiStore);
+const { handleRefresh } = uiStore;
 const { organization } = storeToRefs(organizationStore);
-const { fetchOrganization, startPolling, stopPolling } = organizationStore;
-const { isSaving, isRefreshing, errorAlert, successAlert } = storeToRefs(uiStore);
-
-const handleRefresh = async () => {
-  if (isRefreshing.value || !organization.value) return;
-
-  isRefreshing.value = true;
-  errorAlert.value = '';
-  successAlert.value = '';
-
-  try {
-    const response = await api.post('/organization/refresh');
-    organization.value = response.data.organization;
-    successAlert.value = 'Запущено обновление отзывов...';
-    startPolling();
-  } catch (err: any) {
-    console.error('Error refreshing reviews:', err);
-    if (err.response && err.response.data && err.response.data.message) {
-      errorAlert.value = err.response.data.message;
-    } else {
-      errorAlert.value = 'Не удалось запустить обновление.';
-    }
-    isRefreshing.value = false;
-  }
-};
+const { fetchOrganization, stopPolling } = organizationStore;
 
 onMounted(fetchOrganization);
 onUnmounted(stopPolling);

@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import {defineStore, storeToRefs} from 'pinia'
 import { ref } from 'vue'
 import api from "@/utils/api"
 import { useReviewsStore } from './reviews'
@@ -77,5 +77,22 @@ export const useOrganizationStore = defineStore('organization', () => {
         }
     }
 
-    return { organization, fetchOrganization, startPolling, stopPolling }
+    const { reviews } = storeToRefs(reviewsStore);
+
+    const saveSettings = async (url: string) => {
+        const response = await api.post('/organization/settings', { url });
+        organization.value = response.data.organization;
+        reviews.value = [];
+
+        startPolling();
+    };
+
+    const refresh = async () => {
+        const response = await api.post('/organization/refresh');
+        organization.value = response.data.organization;
+        startPolling();
+    };
+
+
+    return { organization, fetchOrganization, startPolling, stopPolling, saveSettings, refresh }
 })
