@@ -2,15 +2,16 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 import { useOrganizationStore } from "@/stores/organization";
-const organizationStore = useOrganizationStore();
-const { saveSettings, refresh } = organizationStore;
 
 export const useUiStore = defineStore('ui', () => {
-    const urlInput = ref<string>('')
-    const isSaving = ref<boolean>(false)
-    const isRefreshing = ref<boolean>(false)
-    const errorAlert = ref<string>('')
-    const successAlert = ref<string>('')
+    const urlInput = ref<string>('');
+    const isSaving = ref<boolean>(false);
+    const isRefreshing = ref<boolean>(false);
+    const errorAlert = ref<string>('');
+    const successAlert = ref<string>('');
+
+    const organizationStore = useOrganizationStore();
+    const { saveSettings, refresh } = organizationStore;
 
     const clearAlerts = () => {
         errorAlert.value = ''
