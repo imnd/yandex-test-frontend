@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import router from '@/router';
 
 const getBaseApiUrl = (): string => {
     return import.meta.env.VITE_API_URL || '/api';
@@ -73,7 +74,7 @@ api.interceptors.response.use(
 
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('auth_user');
-            window.location.href = '/login';
+            router.push('/login');
         }
 
         // Auto-retry once on CSRF mismatch (419) by fetching a fresh CSRF cookie
