@@ -6,19 +6,12 @@ import NavbarBlock from '@/components/NavbarBlock.vue';
 import OrganizationBlock from '@/components/OrganizationBlock.vue';
 import ReviewsSection from '@/components/ReviewsSection.vue';
 import SettingsCard from '@/components/SettingsCard.vue';
-
-import {storeToRefs} from "pinia";
-import {useOrganizationStore} from "@/stores/organization";
-
-const organizationStore = useOrganizationStore();
-const { organization } = storeToRefs(organizationStore);
 </script>
 
 <template>
   <div class="dashboard-layout">
     <NavbarBlock />
 
-    <!-- Main Content -->
     <main class="container main-content animate-fade">
       <AlertsBlock />
 
