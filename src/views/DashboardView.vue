@@ -6,6 +6,12 @@ import NavbarBlock from '@/components/NavbarBlock.vue';
 import OrganizationBlock from '@/components/OrganizationBlock.vue';
 import ReviewsSection from '@/components/ReviewsSection.vue';
 import SettingsCard from '@/components/SettingsCard.vue';
+
+import { onBeforeUnmount } from 'vue';
+import { useOrganizationStore } from '@/stores/organization';
+const organizationStore = useOrganizationStore();
+const { stopPolling } = organizationStore;
+onBeforeUnmount(stopPolling);
 </script>
 
 <template>

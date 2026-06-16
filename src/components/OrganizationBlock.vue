@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useOrganizationStore } from "@/stores/organization";
 import { storeToRefs } from "pinia";
-import {useUiStore} from "@/stores/ui";
-import {onMounted, onUnmounted} from "vue";
+import { useUiStore } from "@/stores/ui";
+import { onMounted } from "vue";
 
 const organizationStore = useOrganizationStore();
 const uiStore = useUiStore();
@@ -10,10 +10,9 @@ const uiStore = useUiStore();
 const { isSaving, isRefreshing } = storeToRefs(uiStore);
 const { handleRefresh } = uiStore;
 const { organization } = storeToRefs(organizationStore);
-const { fetchOrganization, stopPolling } = organizationStore;
 
+const { fetchOrganization } = organizationStore;
 onMounted(fetchOrganization);
-onUnmounted(stopPolling);
 </script>
 
 <template>
