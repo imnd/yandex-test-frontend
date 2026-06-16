@@ -31,13 +31,13 @@ export const useReviewsStore = defineStore('reviews', () => {
     const fetchReviews = async (page: number = 1) => {
         isReviewsLoading.value = true
         try {
-            const response = await api.get(`/organization/reviews?page=${page}`)
-            reviews.value = response.data.data || []
-            pagination.value = {
-                current_page: response.data.current_page || 1,
-                last_page: response.data.last_page || 1,
-                total: response.data.total || 0,
-                per_page: response.data.per_page || 50,
+            const { data } = await api.get(`/organization/reviews?page=${page}`)
+            reviews.value = data.reviews || []
+            pagination.value = data.pagination || {
+                current_page: 1,
+                last_page: 1,
+                total: 0,
+                per_page: 50,
             }
         } catch (err) {
             console.error('Error fetching reviews:', err)
