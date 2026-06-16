@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import api, { getCsrfToken } from '../utils/api';
+import api, { getCsrfCookie } from '../utils/api';
 
 const router = useRouter();
 const email = ref<string>('admin@example.com');
@@ -20,7 +20,7 @@ const handleLogin = async () => {
 
   try {
     // 1. Sanctum CSRF Handshake
-    await getCsrfToken();
+    await getCsrfCookie();
 
     // 2. Perform Login Request
     const response = await api.post('/auth/login', {
