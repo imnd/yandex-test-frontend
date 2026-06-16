@@ -52,7 +52,7 @@ const changePage = (page: number) => {
           <div class="author-avatar-box">
             <img v-if="review.author_avatar" :src="review.author_avatar" :alt="review.author_name" class="author-avatar" />
             <div v-else class="author-avatar-placeholder">
-              {{ review.author_name.charAt(0).toUpperCase() }}
+              {{ review.author_name?.charAt(0)?.toUpperCase() }}
             </div>
           </div>
 
