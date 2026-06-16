@@ -82,14 +82,10 @@ api.interceptors.response.use(
             try {
                 memoryCsrfToken = null; // force refetch
                 await getCsrfCookie();
-                if (memoryCsrfToken) {
-                    originalRequest.headers['X-CSRF-TOKEN'] = memoryCsrfToken;
-                } else {
-                    const matches = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
-                    const cookieToken = matches ? decodeURIComponent(matches[1]) : null;
-                    if (cookieToken) {
-                        originalRequest.headers['X-XSRF-TOKEN'] = cookieToken;
-                    }
+                const matches = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
+                const cookieToken = matches ? decodeURIComponent(matches[1]) : null;
+                if (cookieToken) {
+                    originalRequest.headers['X-XSRF-TOKEN'] = cookieToken;
                 }
                 return api(originalRequest);
             } catch (csrfError) {
