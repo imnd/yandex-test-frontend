@@ -2,14 +2,9 @@ FROM --platform=linux/amd64 node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-ARG VITE_API_URL
-ARG VITE_SANCTUM_CSRF_URL
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_SANCTUM_CSRF_URL=$VITE_SANCTUM_CSRF_URL
-ARG CACHE_BUST=3
+ARG CACHE_BUST=5
 RUN echo $CACHE_BUST
 COPY . .
-RUN cat .env.production
 RUN npm run build
 
 FROM --platform=linux/amd64 nginx:alpine
