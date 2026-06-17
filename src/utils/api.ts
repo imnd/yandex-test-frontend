@@ -2,10 +2,8 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import router from '@/router';
 
 const getBaseApiUrl = (): string => {
-    console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
-    console.log('env:' + import.meta.env)
+    alert('API URL: ' + import.meta.env.VITE_API_URL);
     return import.meta.env.VITE_API_URL || '/api';
-
 };
 
 const getCsrfCookieUrl = (): string => {
