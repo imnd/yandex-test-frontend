@@ -2,9 +2,9 @@ FROM --platform=linux/amd64 node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-COPY . .
 ARG CACHE_BUST=2
 RUN echo $CACHE_BUST
+COPY . .
 RUN npm run build
 
 FROM --platform=linux/amd64 nginx:alpine
