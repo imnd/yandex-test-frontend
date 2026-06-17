@@ -9,7 +9,7 @@ export interface Organization {
     name?: string;
     url: string;
     status: 'pending' | 'processing' | 'completed' | 'failed';
-    rating?: number | string;
+    rating?: number;
     rating_count?: number;
     review_count?: number;
     last_parsed_at?: string;
