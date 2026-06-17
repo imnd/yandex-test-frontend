@@ -1,3 +1,3 @@
-FROM --platform=linux/amd64 nginx:alpine
+FROM --platform=linux/amd64 nginx:1.25-alpine
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
