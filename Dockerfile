@@ -9,6 +9,7 @@ ENV VITE_SANCTUM_CSRF_URL=$VITE_SANCTUM_CSRF_URL
 ARG CACHE_BUST=3
 RUN echo $CACHE_BUST
 COPY . .
+RUN cat .env.production
 RUN npm run build
 
 FROM --platform=linux/amd64 nginx:alpine
