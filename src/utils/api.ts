@@ -2,7 +2,6 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import router from '@/router';
 
 const getBaseApiUrl = (): string => {
-    alert('API URL: ' + import.meta.env.VITE_API_URL);
     return import.meta.env.VITE_API_URL || '/api';
 };
 
