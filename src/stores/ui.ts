@@ -11,9 +11,6 @@ export const useUiStore = defineStore('ui', () => {
     const errorAlert = ref<string>('');
     const successAlert = ref<string>('');
 
-    const organizationStore = useOrganizationStore();
-    const { saveSettings, refresh } = organizationStore;
-
     const clearAlerts = () => {
         errorAlert.value = ''
         successAlert.value = ''
@@ -30,7 +27,7 @@ export const useUiStore = defineStore('ui', () => {
         successAlert.value = '';
 
         try {
-            await saveSettings(urlInput.value)
+            await useOrganizationStore().saveSettings(urlInput.value)
             successAlert.value = 'Настройки сохранены. Запущен парсинг отзывов...';
         } catch (err: unknown) {
             console.error('Error saving settings:', err);
@@ -50,7 +47,7 @@ export const useUiStore = defineStore('ui', () => {
         successAlert.value = '';
 
         try {
-            await refresh();
+            await useOrganizationStore().refresh();
             successAlert.value = 'Запущено обновление отзывов...';
         } catch (err: unknown) {
             console.error('Error refreshing reviews:', err);
